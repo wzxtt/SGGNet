@@ -1,0 +1,35 @@
+# SGGNet Default Configuration
+# For FAZ Segmentation in OCTA Images
+
+# Data
+data_root: "./data/OCTA-500"
+img_size: 512
+val_split: 0.2
+
+# Model
+in_channels: 3
+num_classes: 1
+base_channels: 52
+
+# Training
+epochs: 100
+batch_size: 8
+lr: 1.0e-4
+weight_decay: 1.0e-5
+optimizer: adam
+scheduler: cosine
+
+# Seeds for multi-seed evaluation
+seeds: [42, 123, 456, 789, 1024]
+
+# Loss
+bce_weight: 0.5
+dice_weight: 0.5
+
+# Logging
+log_interval: 10
+save_dir: "checkpoints"
+log_dir: "logs"
+
+# Evaluation
+output_csv: "results.csv"

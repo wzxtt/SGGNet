@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Data / weights
+data/
+checkpoints/
+*.pth
+*.pt
+*.onnx
+
+# Logs / outputs
+runs/
+logs/
+output/
+*.log
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Git / backup
+*.aux
+*.out
+*.toc
