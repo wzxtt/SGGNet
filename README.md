@@ -1,4 +1,4 @@
-# SGGNet: Integrating Swin Transformer and Dynamic Snake Convolution for FAZ Segmentation in OCTA
+# SGGNet: Integrating Swin Transformer and Dynamic Snake Convolution for FAZ Segmentation in OCTA v1.0.0 (PLOS ONE revision)
 
 This repository contains the official PyTorch implementation of SGGNet, a deep learning model for Foveal Avascular Zone (FAZ) segmentation in Optical Coherence Tomography Angiography (OCTA) images.
 
