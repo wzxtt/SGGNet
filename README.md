@@ -62,8 +62,8 @@ python train.py \
     --data_root ./data/OCTA-500 \
     --seed 42 \
     --epochs 100 \
-    --lr 1e-4 \
-    --batch_size 8
+    --lr 1e-3 \
+    --batch_size 2
 
 # Train with all 5 seeds
 for seed in 42 123 456 789 1024; do
@@ -73,13 +73,31 @@ done
 
 ### Training Details
 
-- **Optimizer**: Adam (lr=1e-4, weight_decay=1e-5)
-- **Scheduler**: Cosine Annealing
+- **Optimizer**: Adam (lr=1e-3, weight_decay=1e-4)
+- **Scheduler**: none
 - **Loss**: BCE + Dice Loss
-- **Input Size**: 512 x 512
-- **Batch Size**: 8
+- **Input Size**: 304 x 304 (3M subset); 400 x 400 (6M subset)
+- **Batch Size**: 2
 - **Epochs**: 100
-- **Data Augmentation**: Random horizontal flip, random vertical flip, random 90-degree rotation
+- **Data Augmentation**: Random horizontal flip, random vertical flip, and random 90-degree rotation, each applied with probability 0.5
+
+### Dataset split
+
+Experiments use the official OCTA-500 split: 3M has 140 training, 10 validation and 50 test images; 6M has 180, 20 and 100. Put the training and validation images in `data_root` and pass `--val_split 0.0667` for 3M or `--val_split 0.1` for 6M so that the validation count matches the paper; the test images are evaluated separately with `evaluate.py`.
+
+## Data and reproduction files
+
+The `reproduce/` directory contains the aggregate outputs behind the tables and the statistical analysis.
+
+| File | Rows | Contents |
+|------|------|----------|
+| `supplementary_raw_results.csv` | 70 | Per-seed Dice, Jaccard and HD for the seven models in Table 2 (7 models x 5 seeds x 2 subsets). |
+| `per_image_results.csv` | 1,050 | Per-image Dice, Jaccard and HD, averaged over the five seeds, for every test image and model (7 models x 150 test images). Input to the paired tests in Section 4.3 and to Supplementary Table S1. |
+| `supplementary_pvalues.csv` | 36 | Paired t and exact Wilcoxon results, Holm-adjusted p-values, 95% confidence intervals and Cohen's d_z for every baseline and metric. |
+
+`generate_supplementary_data.py` rebuilds the three files from raw model outputs, and `supplementary_fig_s1_loss_curves.py` regenerates Fig. S1.
+
+Not included in this release: per-seed or per-image outputs for the five ablation variants in Table 5, per-image boundary metrics (HD95, ASSD, B-F1) behind Table 4, and the per-seed values behind Supplementary Tables S2 and S3. Those tables report mean values only.
 
 ## Evaluation
 

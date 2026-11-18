@@ -3,8 +3,8 @@
 
 # Data
 data_root: "./data/OCTA-500"
-img_size: 512
-val_split: 0.2
+img_size: 304          # 3M subset; use 400 for 6M
+val_split: 0.0667     # 3M: 10/150; use 0.1 for 6M (20/200)
 
 # Model
 in_channels: 3
@@ -13,11 +13,11 @@ base_channels: 52
 
 # Training
 epochs: 100
-batch_size: 8
-lr: 1.0e-4
-weight_decay: 1.0e-5
+batch_size: 2
+lr: 1.0e-3
+weight_decay: 1.0e-4
 optimizer: adam
-scheduler: cosine
+scheduler: none
 
 # Seeds for multi-seed evaluation
 seeds: [42, 123, 456, 789, 1024]

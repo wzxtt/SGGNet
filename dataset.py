@@ -9,7 +9,7 @@ import torchvision.transforms.functional as TF
 
 
 class OCTAFAZDataset(Dataset):
-    def __init__(self, data_root, split='train', img_size=512):
+    def __init__(self, data_root, split='train', img_size=304):
         self.data_root = data_root
         self.split = split
         self.img_size = img_size

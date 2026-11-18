@@ -93,10 +93,10 @@ def main():
     parser.add_argument('--data_root', type=str, required=True)
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--epochs', type=int, default=100)
-    parser.add_argument('--lr', type=float, default=1e-4)
-    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--batch_size', type=int, default=2)
     parser.add_argument('--config', type=str, default='configs/default.yaml')
-    parser.add_argument('--img_size', type=int, default=512)
+    parser.add_argument('--img_size', type=int, default=304)
     parser.add_argument('--val_split', type=float, default=0.2)
     parser.add_argument('--save_dir', type=str, default='checkpoints')
     args = parser.parse_args()
@@ -109,6 +109,11 @@ def main():
         args.batch_size = cfg.get('batch_size', args.batch_size)
         args.img_size = cfg.get('img_size', args.img_size)
         args.val_split = cfg.get('val_split', args.val_split)
+        args.weight_decay = cfg.get('weight_decay', 1e-4)
+        args.scheduler = cfg.get('scheduler', 'none')
+    else:
+        args.weight_decay = 1e-4
+        args.scheduler = 'none'
 
     set_seed(args.seed)
 
@@ -131,8 +136,10 @@ def main():
     model = SGGNet(in_channels=3, num_classes=1).to(device)
 
     criterion = BCEDiceLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-5)
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    scheduler = None
+    if str(args.scheduler).lower() == 'cosine':
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.epochs)
 
     log_dir = os.path.join('logs', f'seed_{args.seed}')
     writer = SummaryWriter(log_dir)
@@ -148,13 +155,14 @@ def main():
     for epoch in range(1, args.epochs + 1):
         train_loss, train_dice = train_one_epoch(model, train_loader, criterion, optimizer, device)
         val_loss, val_dice = validate(model, val_loader, criterion, device)
-        scheduler.step()
+        if scheduler is not None:
+            scheduler.step()
 
         writer.add_scalar('Loss/train', train_loss, epoch)
         writer.add_scalar('Loss/val', val_loss, epoch)
         writer.add_scalar('Dice/train', train_dice, epoch)
         writer.add_scalar('Dice/val', val_dice, epoch)
-        writer.add_scalar('LR', scheduler.get_last_lr()[0], epoch)
+        writer.add_scalar('LR', optimizer.param_groups[0]['lr'], epoch)
 
         print(f"Epoch [{epoch}/{args.epochs}] "
               f"Train Loss: {train_loss:.4f}, Train Dice: {train_dice:.4f} | "
